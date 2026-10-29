@@ -42,6 +42,22 @@ class ArtifactTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'payload'):
             release.verify(self.root, {'files': {'file': '0' * 64}})
 
+    def test_glfw_accepts_only_shared_sws_and_verified_imports(self):
+        path = self.root / 'library'
+        data = bytearray(64); data[:8] = b'\x7fELF\x02\x01\x01\x53'
+        struct.pack_into('<HH', data, 16, 3, 183); path.write_bytes(data)
+        exports = '\n'.join('T ' + s for s in ('glfwInit', 'glfwCreateWindow', 'glfwCreateWindowSurface', 'glfwPollEvents'))
+        needed = '  0x1 (NEEDED) Shared library: [libsws_client_c.so]\n'
+        with patch.object(audit.subprocess, 'check_output', side_effect=[needed, 'U sws_poll_event\n', exports]):
+            self.assertEqual(audit.audit(path, 'glfw')['imports'], ['sws_poll_event'])
+        for dependencies in ('', needed.replace('libsws_client_c.so', 'libc.so.6'), needed + needed):
+            with patch.object(audit.subprocess, 'check_output', return_value=dependencies), self.assertRaisesRegex(ValueError, 'dependencies'):
+                audit.audit(path, 'glfw')
+        with patch.object(audit.subprocess, 'check_output', side_effect=[needed, 'U internal_unresolved_helper\n']), self.assertRaisesRegex(ValueError, 'Unverified'):
+            audit.audit(path, 'glfw')
+        with patch.object(audit.subprocess, 'check_output', side_effect=[needed, '', exports + '\nT sws_poll_event']), self.assertRaisesRegex(ValueError, 'exports'):
+            audit.audit(path, 'glfw')
+
     def test_development_build_cannot_be_published(self):
         receipt = self.root / 'build.json'
         for fields in ({'local_source': True}, {'local_source': False, 'producer_dirty': True}):

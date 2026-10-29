@@ -1,4 +1,4 @@
-name: Build LWJGL core
+name: Build LWJGL runtime
 on:
   push:
     paths:
@@ -35,11 +35,11 @@ jobs:
           name: scarlet-rust-toolchain
       - name: Check producer
         run: python3 -m unittest discover -s producer/tests -p 'test_*.py'
-      - name: Build pinned core
+      - name: Build pinned core, GLFW and Vulkan bindings
         run: nix develop --command python3 producer/build.py --output producer/.build/ci --jobs 4
       - name: Package and verify archive
         env:
-          VERSION: ${{ inputs.version || format('v0.1.{0}', github.run_number) }}
+          VERSION: ${{ inputs.version || format('v0.2.{0}', github.run_number) }}
         run: |
           nix develop --command python3 producer/release.py \
             --build-receipt producer/.build/ci/build.json \

@@ -21,11 +21,11 @@
   "lwjgl": {
     "repository": "https://github.com/petitstrawberry/lwjgl3",
     "branch": "scarlet-3.4.3",
-    "commit": "0c092dbfc3221c5a25e3657e1b0954779f2e5ff2",
+    "commit": "7095c8df7a302f00ba60fe1e083315f6f8f2efec",
     "upstream_tag": "3.4.3",
     "upstream_commit": "30fac9b95f99cda97312232be25ba55297bf9951",
-    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/0c092dbfc3221c5a25e3657e1b0954779f2e5ff2",
-    "sha256": "1b63d7b2ed7e0cda17cc78e7ec53b5935a41814f41dc790ded3dff0ce9ff08a7"
+    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/7095c8df7a302f00ba60fe1e083315f6f8f2efec",
+    "sha256": "e75d878a5f4d5b94b28b18cd293af918c88aaf9f7acf614569687471deaed9b6"
   },
   "llvm": {
     "repository": "https://github.com/petitstrawberry/llvm-project",
@@ -39,5 +39,21 @@
   "jspecify_license": {
     "url": "https://raw.githubusercontent.com/jspecify/jspecify/b2a10e14bb81c1b7cb6e488c112fe55cb2218d7d/LICENSE",
     "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  "glfw": {
+    "repository": "https://github.com/petitstrawberry/glfw",
+    "branch": "scarlet-3.5.1",
+    "commit": "cfe5719d95517bb1be8a22f50f3e5e526a945edb",
+    "url": "https://codeload.github.com/petitstrawberry/glfw/tar.gz/cfe5719d95517bb1be8a22f50f3e5e526a945edb",
+    "sha256": "8545a99d25e2ab76b2dbf49f1176eab8067326eb930760956c5139937fc212a4",
+    "upstream_commit": "d9d6f0f1f967807ffade6598ea9a631ebaf37a56",
+    "upstream_version": "3.5.1-dev"
+  },
+  "scarlet": {
+    "repository": "https://github.com/petitstrawberry/Scarlet",
+    "branch": "feat/glfw-vulkan-runtime",
+    "commit": "65f8becaa6f08c33183a085a03efa8608e0dac93",
+    "url": "https://codeload.github.com/petitstrawberry/Scarlet/tar.gz/65f8becaa6f08c33183a085a03efa8608e0dac93",
+    "sha256": "42cede217eb07d73387504a727e5a130023161945ab4cb5f7b96d6350474438a"
   }
 }

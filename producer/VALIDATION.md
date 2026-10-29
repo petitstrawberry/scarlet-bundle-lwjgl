@@ -29,12 +29,12 @@ The output records the kernel and payload checksums, QEMU command, compilation
 and guest logs, and pass/fail evidence. Use a new output directory for each
 run. The VM uses an isolated initramfs and shuts down after its tests.
 
-The ELF audit rejects foreign OSABI, shared-library dependencies, DSO TLS,
+The core ELF audit rejects foreign OSABI, shared-library dependencies, DSO TLS,
 unsupported dynamic flags/relocations, unverified imports and exported private
 libffi symbols. Host tests cover damaged cache/payload data, foreign ELF,
 unsupported loader flags and rejection of development releases.
 
-These checks cover the core recipe only. Optional LWJGL modules, other OS
+The preceding checks cover the core recipe only. Optional LWJGL modules, other OS
 bindings, `LibCStdio`, Java FFM/multi-release implementations and broader
 application compatibility are not established by this validation.
 
@@ -60,3 +60,78 @@ OpenJDK producer revision: `200b6a6a4ee7938d641b25be5a96f14122e0b26c`.
 The runtime-module change is proposed in [OpenJDK bundle PR #6](https://github.com/petitstrawberry/scarlet-bundle-openjdk/pull/6),
 stacked on its native JNI loader prerequisite, PR #5. These PRs were not merged
 as part of this validation.
+
+## Native GLFW and Vulkan WSI
+
+On 2026-10-29 the native graphics test passed with OpenJDK 25 C2 in an
+AArch64 HVF guest. It used real SWS windows and the SGFX VirGL backend:
+
+- GLFW initialization selected `GLFW_PLATFORM_SCARLET`; the required Vulkan
+  extensions were `VK_KHR_surface` and `VK_SGFX_scarlet_surface`.
+- Instance/device/surface creation and single-device Vulkan 1.1 presentation
+  queries succeeded, including the present rectangle and `AcquireNextImage2`.
+- Clear/submit/present completed at 320×240 and again at 384×256 after resize.
+  The old swapchain returned `VK_ERROR_OUT_OF_DATE_KHR` before replacement.
+- A key injected through QEMU's keyboard device reached both the GLFW key and
+  character callbacks. The framebuffer resize callback also ran.
+- Surface and swapchain teardown completed without destroying the GLFW window.
+  C2 level 4 compilation of `GraphicsSmoke::render` and `::swapchain` was checked.
+
+The earlier interpreter run also completed window/presentation, resize and
+keyboard handling. The expanded test above is validated with C2. These checks
+establish API and guest execution, not Vulkan conformance. QMP screendump does
+not expose the GL scanout surface on this QEMU build, so pixel output was not
+verified by screenshot. OpenGL, audio, IME, multi-monitor and wider application
+compatibility are outside this test.
+
+The graphics test accepts explicit runtime inputs and records their SHA-256
+values, the HVF command, guest log checksum and pass/fail result:
+
+```sh
+nix develop --command python3 producer/tests/validate_graphics.py \
+  --kernel /path/to/Image --init /path/to/init --loader /path/to/scarlet-ld \
+  --java /path/to/java --java-home /path/to/openjdk-25 \
+  --core /path/to/runtime/usr/lib/lwjgl/3.4.3 \
+  --desktop /path/to/desktop.cpio \
+  --vulkan /path/to/libvulkan.so.1 --icd /path/to/libvulkan_sgfx.so \
+  --sws-client /path/to/libsws_client_c.so --driver /path/to/libsgfx_scarlet_virgl.so \
+  --qemu /path/to/hvf-virgl/qemu-system-aarch64 \
+  --output producer/artifacts/glfw-vulkan/hvf
+```
+
+The desktop image must contain SWS, sbusd and their resources. The harness uses
+an isolated initramfs and no network/disk, injects one keyboard event over QMP,
+and shuts the guest down. It requires HVF and GL-capable VirtIO GPU support.
+
+### Published graphics archive
+
+The exact [v0.2.4 CI archive](https://github.com/petitstrawberry/scarlet-bundle-lwjgl/releases/tag/v0.2.4)
+passed the expanded C2 graphics test. [CI run 40827289362](https://github.com/petitstrawberry/scarlet-bundle-lwjgl/actions/runs/40827289362)
+completed its build, ELF/module checks and archive verification. The published
+archive was downloaded again and matched the CI checksum.
+
+| Input | SHA-256 |
+| --- | --- |
+| Release archive | `0f89ce23fb53c7c749b3741b7569ce126c83fd3fc8c77b73e35374dd1424331b` |
+| GLFW native library | `14f65e81ee06125de7143c678cca50a136fe03d899caf2dd72d6e6293b068e69` |
+| LWJGL native core | `1d542db88988e92a3aad0c0a6847bbccc5051e2bd33651fa3282172d0e92bb9d` |
+| GLFW JAR | `bde6089364bf5d3fc1c2891feffeb4248a23c5c4d3bbb57e35e86179a01aab6f` |
+| Vulkan JAR | `5181d989e943526cb9bf9f3360d6b11caacd3857b217aad74d43f51d8830d0d7` |
+| SWS client | `f9f98d301b4c62a4bff52b958bfa2791b41428024a7b801f380099f85664a0a8` |
+| Vulkan loader | `01332ad8da92bf6f183d788f5d4266658f26324e2416d97fac42245365d579ec` |
+| SGFX ICD | `9f6247464d8b257c763436f2368f37d9bd7121a9f9dc4ae626eb4927a3fa751b` |
+| VirGL backend | `f9160d6b636658d2e4efac11e6b9ff5e3ef0da95d89bc92c975351943d014de6` |
+| Guest log | `24c30e08aab562c75ddf65ff43b3412397bab25cabd972b82388deeb7692d454` |
+
+Runtime source revisions: Vulkan-Loader `83f0038b735f08e9a8282ef37b74e1eab1fbf896`,
+SGFX `12df11ee00f4af173f191079b9365548b1c60301`, and the SWS client from Scarlet
+`65f8becaa6f08c33183a085a03efa8608e0dac93`. The native runtime integration is
+[Scarlet PR #614](https://github.com/petitstrawberry/Scarlet/pull/614).
+The release attachment `graphics-validation.json` records all guest input
+hashes and the result. The producer archive contains no kernel or SWS runtime.
+
+[SGFX CI run 40827882875](https://github.com/petitstrawberry/sgfx/actions/runs/40827882875)
+passed on the pinned ICD revision: native AArch64 and RISC-V builds/lints,
+Linux AArch64 WSI checking, and portable tests/lints/documentation with both
+upstream and Scarlet toolchains. Native guest execution above covers AArch64;
+the RISC-V result is a build check.
