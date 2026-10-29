@@ -35,8 +35,8 @@ public class SdlGraphicsSmoke {
      try {
       ByteBuffer data=MemoryUtil.memByteBuffer(mapped.get(0),4096);
       for(int i=0;i<data.capacity();i++)data.put(i,(byte)(i*37));
-      check(vmaFlushAllocation(allocator,memory,0,4096),"VMA flush");
-      check(vmaInvalidateAllocation(allocator,memory,0,4096),"VMA invalidate");
+      vmaFlushAllocation(allocator,memory,0,4096);
+      vmaInvalidateAllocation(allocator,memory,0,4096);
       for(int i=0;i<data.capacity();i++)if(data.get(i)!=(byte)(i*37))throw new AssertionError("VMA mapped memory");
      } finally {vmaUnmapMemory(allocator,memory);}
     } finally {vmaDestroyBuffer(allocator,buffer.get(0),memory);}

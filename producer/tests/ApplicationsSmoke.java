@@ -2,6 +2,7 @@ public class ApplicationsSmoke {
     public static void main(String[] args) throws Exception {
         SdlLoadSmoke.main(args);
         StbSmoke.main(args);
+        LoaderConcurrencySmoke.main(args);
         FreeTypeSmoke.main(args);
         ShaderSmoke.main(args);
         OpenALSmoke.main(args);

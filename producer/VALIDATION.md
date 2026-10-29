@@ -215,3 +215,17 @@ are not implemented. OpenGL dispatch loading is verified, but no vendor
 renderer or OpenGL window context is supplied. The Vulkan frontend remains a
 bounded, non-conformant implementation; these checks do not establish general
 application compatibility.
+
+On 2026-10-30 the pinned native application sources passed the headless suite
+and the SDL Vulkan/VMA graphics suite with OpenJDK 25 under HVF. The additional
+four-thread loader test validates 128 overlapping missing-library errors.
+These tests require the serialized loader from Scarlet revision
+`6e8f3d0fbf532588b5e9f9606317b3f981f23dab` (or its successor); the older loader
+can reject concurrent first JNI lookups. The loader was built using the
+matching namespaced native Rust TLS runtime.
+
+| Validation input | SHA-256 |
+| --- | --- |
+| Native loader | `3416b48170fcfb0399858a5b5577050fb295d8151b95e36c60ba26e2f86945e7` |
+| Headless guest log | `58072c114c4533dac91d6107a6b10125eb4a6ba3b1d283c0edf5dc9a34a0b9db` |
+| SDL/VMA graphics guest log | `48c1d95936e1c8bc4ff11e05d36b8c90feef63480c3f055a9da025d5332142ea` |

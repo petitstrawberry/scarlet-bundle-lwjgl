@@ -8,8 +8,8 @@ import subprocess
 from validate import archive, sha
 
 HERE = Path(__file__).resolve().parent
-CASES = ('SdlLoadSmoke', 'StbSmoke', 'FreeTypeSmoke', 'ShaderSmoke', 'OpenALSmoke', 'OpenGLLoadSmoke', 'ApplicationsSmoke')
-MARKERS = ('SDL_LOAD PASS', 'STB_NATIVE PASS', 'FREETYPE_NATIVE PASS', 'SHADER_NATIVE PASS',
+CASES = ('SdlLoadSmoke', 'StbSmoke', 'LoaderConcurrencySmoke', 'FreeTypeSmoke', 'ShaderSmoke', 'OpenALSmoke', 'OpenGLLoadSmoke', 'ApplicationsSmoke')
+MARKERS = ('SDL_LOAD PASS', 'STB_NATIVE PASS', 'LOADER_CONCURRENCY PASS', 'FREETYPE_NATIVE PASS', 'SHADER_NATIVE PASS',
            'OPENAL_NATIVE PASS', 'OPENGL_DISPATCH PASS', 'VMA_LOAD PASS', 'APPLICATION_MODULES PASS')
 
 

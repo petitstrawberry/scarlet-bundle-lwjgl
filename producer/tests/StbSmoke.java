@@ -12,8 +12,9 @@ public class StbSmoke {
   CountDownLatch start=new CountDownLatch(4);AtomicReference<Throwable> failure=new AtomicReference<>();
   Thread[] workers=new Thread[4];
   for(int n=0;n<workers.length;n++) {final boolean flip=(n&1)!=0;workers[n]=new Thread(()->{
-   ByteBuffer input=MemoryUtil.memAlloc(png.length).put(png).flip();
+   ByteBuffer input=null;
    try(MemoryStack stack=MemoryStack.stackPush()) {
+    input=MemoryUtil.memAlloc(png.length).put(png).flip();
     STBImage.stbi_set_flip_vertically_on_load_thread(flip?1:0);System.out.println("STB thread flags="+flip);start.countDown();if(!start.await(5,TimeUnit.SECONDS))throw new AssertionError("thread startup timeout");
     IntBuffer x=stack.mallocInt(1),y=stack.mallocInt(1),channels=stack.mallocInt(1);
     for(int i=0;i<30;i++) {
