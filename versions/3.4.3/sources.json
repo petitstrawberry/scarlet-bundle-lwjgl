@@ -43,17 +43,24 @@
   "glfw": {
     "repository": "https://github.com/petitstrawberry/glfw",
     "branch": "scarlet-3.5.1",
-    "commit": "cfe5719d95517bb1be8a22f50f3e5e526a945edb",
-    "url": "https://codeload.github.com/petitstrawberry/glfw/tar.gz/cfe5719d95517bb1be8a22f50f3e5e526a945edb",
-    "sha256": "8545a99d25e2ab76b2dbf49f1176eab8067326eb930760956c5139937fc212a4",
+    "commit": "fe0f62eb7f80d629dcdf179ee3e5a55cff4624a6",
+    "url": "https://codeload.github.com/petitstrawberry/glfw/tar.gz/fe0f62eb7f80d629dcdf179ee3e5a55cff4624a6",
+    "sha256": "34eae39df3770b9f98e25a91ad8da02bf0a136372c0af2a6640ab6e94737e0aa",
     "upstream_commit": "d9d6f0f1f967807ffade6598ea9a631ebaf37a56",
     "upstream_version": "3.5.1-dev"
   },
   "scarlet": {
     "repository": "https://github.com/petitstrawberry/Scarlet",
-    "branch": "feat/glfw-vulkan-runtime",
-    "commit": "65f8becaa6f08c33183a085a03efa8608e0dac93",
-    "url": "https://codeload.github.com/petitstrawberry/Scarlet/tar.gz/65f8becaa6f08c33183a085a03efa8608e0dac93",
-    "sha256": "42cede217eb07d73387504a727e5a130023161945ab4cb5f7b96d6350474438a"
+    "branch": "feat/glfw-scarletui-window",
+    "commit": "ff643341fc230b46a6633631783eca8716d3db5d",
+    "url": "https://codeload.github.com/petitstrawberry/Scarlet/tar.gz/ff643341fc230b46a6633631783eca8716d3db5d",
+    "sha256": "7158912666a42a585c33d73b59556d9d72d87a28f9f2028f019a731084dbca85"
+  },
+  "scarlet_ui": {
+    "repository": "https://github.com/petitstrawberry/scarlet-ui",
+    "branch": "feat/window-chrome-ffi",
+    "commit": "409b91758b67a0084f411b133c885a88e54b1461",
+    "url": "https://codeload.github.com/petitstrawberry/scarlet-ui/tar.gz/409b91758b67a0084f411b133c885a88e54b1461",
+    "sha256": "1b5b6e32e586b58a858c7e7c24fc1e558de3f205bcadaf99b0be9ec98eeb0437"
   }
 }

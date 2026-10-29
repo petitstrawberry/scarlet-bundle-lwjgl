@@ -24,6 +24,8 @@ GLFW_IMPORTS = {
     'strchr', 'strcmp', 'strcpy', 'strcspn', 'strncmp', 'strncpy', 'strspn', 'strstr', 'strtok',
     'strtol', 'strtoul', 'vsnprintf', 'sws_get_display', 'sws_window_create_ex',
     'sws_window_destroy', 'sws_window_title', 'sws_window_size', 'sws_window_resize',
+    'sws_scene_create', 'sws_scene_geometry', 'sws_scene_frame', 'sws_scene_resize',
+    'sws_get_output_scale', 'sws_window_resizable',
     'sws_window_action', 'sws_window_fullscreen', 'sws_window_pointer_lock', 'sws_poll_event',
 }
 

@@ -94,6 +94,7 @@ nix develop --command python3 producer/tests/validate_graphics.py \
   --core /path/to/runtime/usr/lib/lwjgl/3.4.3 \
   --desktop /path/to/desktop.cpio \
   --vulkan /path/to/libvulkan.so.1 --icd /path/to/libvulkan_sgfx.so \
+  --scarlet-ui /path/to/libscarlet_ui_window.so \
   --sws-client /path/to/libsws_client_c.so --driver /path/to/libsgfx_scarlet_virgl.so \
   --qemu /path/to/hvf-virgl/qemu-system-aarch64 \
   --output producer/artifacts/glfw-vulkan/hvf
@@ -135,3 +136,17 @@ passed on the pinned ICD revision: native AArch64 and RISC-V builds/lints,
 Linux AArch64 WSI checking, and portable tests/lints/documentation with both
 upstream and Scarlet toolchains. Native guest execution above covers AArch64;
 the RISC-V result is a build check.
+
+
+## Standard window chrome
+
+The native graphics harness now checks content/frame separation, decoration
+and resizable toggles, title updates during presentation, fullscreen/restore,
+and output scaling. Pass `--scarlet-ui` with the frame runtime DSO and run
+`--scale 1` and `--scale 2`. Both scales passed under HVF with OpenJDK 25 C2
+using ScarletUI revision `409b91758b67a0084f411b133c885a88e54b1461`.
+A logical 320×240 content area produces a 320×240 or 640×480 swapchain;
+384×256 after resize produces 384×256 or 768×512. The old swapchain reports
+out-of-date, and frame-only repaints preserve the GPU buffer release contract.
+The GL QEMU display does not support this harness's screendump request, so
+these results establish functional behavior, not screenshot-based appearance.

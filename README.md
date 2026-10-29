@@ -33,9 +33,10 @@ Requires Scarlet's `/bin/scarlet-ld` and a native OpenJDK 25 image with external
 JNI loading and the `jdk.unsupported` module. Linux native libraries are not
 compatible with Scarlet's native ABI. GLFW additionally requires a running SWS
 compositor and the native graphics runtime (`user/lib/scarlet-vulkan` in Scarlet),
-which supplies `/lib/libsws_client_c.so`, `/lib/libvulkan.so.1`, the SGFX ICD and
+which supplies `/lib/libsws_client_c.so`, `/lib/libscarlet_ui_window.so` (ABI 1),
+`/lib/libvulkan.so.1`, the SGFX ICD and
 its driver manifest. The runtime must include the native SWS surface changes in
-[Scarlet](https://github.com/petitstrawberry/Scarlet/tree/5239a9ac72730072d47e6e9d86c13c8d0e68497c),
+[Scarlet](https://github.com/petitstrawberry/Scarlet/tree/ff643341fc230b46a6633631783eca8716d3db5d),
 [Vulkan-Loader](https://github.com/petitstrawberry/Vulkan-Loader/tree/83f0038b735f08e9a8282ef37b74e1eab1fbf896)
 and [SGFX](https://github.com/petitstrawberry/sgfx/tree/12df11ee00f4af173f191079b9365548b1c60301).
 The producer builds the pinned SWS client as a link input; its runtime DSO belongs
@@ -45,7 +46,9 @@ Create GLFW windows with `GLFW_CLIENT_API = GLFW_NO_API`. Obtain the instance
 extensions from `glfwGetRequiredInstanceExtensions` and use
 `glfwCreateWindowSurface`. The native backend uses the fork's private
 `VK_SGFX_scarlet_surface` extension. It supports window resizing, fullscreen,
-keyboard and pointer input, and Vulkan swapchain presentation.
+keyboard and pointer input, and Vulkan swapchain presentation. Standard ScarletUI
+window chrome surrounds the content; window/input coordinates are logical and
+framebuffer extents are physical. Decoration toggles preserve the content size.
 
 ## Scope
 
@@ -81,7 +84,8 @@ python3 producer/release.py \
 ```
 
 The output directory must be new. `--source /path/to/lwjgl3` supports local
-port development, with `--glfw-source` and `--scarlet-source` for the other source
+port development, with `--glfw-source`, `--scarlet-source`, and
+`--scarlet-ui-source` for the other source
 checkouts; such builds cannot be released. Source revisions and
 checksums are in `versions/3.4.3/sources.json`. Port changes belong in the
 LWJGL and GLFW forks; build recipes, CI, release packaging and bundle pins belong here.

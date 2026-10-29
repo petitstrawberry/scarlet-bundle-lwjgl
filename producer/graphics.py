@@ -8,7 +8,7 @@ import subprocess
 from audit import audit
 
 
-def build_graphics(source, glfw, scarlet, out, lib, core_classes, builtins, env, run):
+def build_graphics(source, glfw, scarlet, scarlet_ui, out, lib, core_classes, builtins, env, run):
     logs = out / 'logs'
     sws_target = out / 'sws-target'
     sws_env = dict(env, CARGO_TARGET_DIR=str(sws_target))
@@ -22,6 +22,7 @@ def build_graphics(source, glfw, scarlet, out, lib, core_classes, builtins, env,
     flags = ['--target=aarch64-unknown-none-elf', '-O2', '-fPIC', '-fvisibility=hidden',
              '-fno-stack-protector', '-mno-outline-atomics', '-nostdinc',
              '-isystem', resource + '/include', '-isystem', env['SCARLET_NATIVE_RUNTIME'] + '/include',
+             '-I', scarlet_ui / 'crates/scarlet-ui-window-c/include',
              '-I', scarlet / 'user/lib/sws-client-c/include', '-D__scarlet__=1',
              '-D_GLFW_SCARLET', '-D_GLFW_BUILD_DLL', '-D_POSIX_MONOTONIC_CLOCK=1']
     objects = out / 'glfw-objects'; objects.mkdir()
@@ -57,7 +58,8 @@ def build_graphics(source, glfw, scarlet, out, lib, core_classes, builtins, env,
              '--file', lib / ('lwjgl-' + module + '.jar'), '-C', classes, '.'], out, logs / (module + '-jar.log'), env)
     legal = out / 'image/usr/share/licenses/lwjgl' / lib.name
     shutil.copyfile(glfw / 'LICENSE.md', legal / 'GLFW.txt')
-    return {'glfw': native, 'sws_runtime': {
+    shutil.copyfile(scarlet_ui / 'LICENSE', legal / 'ScarletUI.txt')
+    return {'glfw': native, 'scarlet_ui_runtime': {'path': '/lib/libscarlet_ui_window.so', 'abi': 1, 'included': False}, 'sws_runtime': {
         'path': '/lib/libsws_client_c.so',
         'link_input_sha256': hashlib.sha256((sws / 'libsws_client_c.so').read_bytes()).hexdigest(),
         'included': False,

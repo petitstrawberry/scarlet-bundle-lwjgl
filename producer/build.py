@@ -60,6 +60,7 @@ def build(args):
         download(spec['lwjgl'], spec['lwjgl']['commit'] + '.tar.gz'), out / 'lwjgl-source')
     glfw = args.glfw_source.resolve() if args.glfw_source else extract(download(spec['glfw'], spec['glfw']['commit'] + '.tar.gz'), out / 'glfw-source')
     scarlet = args.scarlet_source.resolve() if args.scarlet_source else extract(download(spec['scarlet'], spec['scarlet']['commit'] + '.tar.gz'), out / 'scarlet-source')
+    scarlet_ui = args.scarlet_ui_source.resolve() if args.scarlet_ui_source else extract(download(spec['scarlet_ui'], spec['scarlet_ui']['commit'] + '.tar.gz'), out / 'scarlet-ui-source')
     core = source / 'modules/lwjgl/core/src'
     for name, header in spec['jni_headers'].items(): download(header, name)
     annotations = download(spec['jspecify'], 'jspecify-1.0.0.jar')
@@ -127,8 +128,8 @@ def build(args):
     shutil.copyfile(rust_root / 'lib/rustlib/src/rust/library/compiler-builtins/LICENSE.txt', legal / 'compiler-builtins.txt')
     shutil.copyfile(ROOT / 'LICENSE', legal / 'producer.txt')
     (legal / 'sources.json').write_text(json.dumps(spec, indent=2) + '\n')
-    graphics = build_graphics(source, glfw, scarlet, out, lib, classes, builtins[0], env, run)
-    receipt = {'graphics': graphics, 'elf': elf, 'version': args.version, 'source': str(source), 'local_source': bool(args.source or args.glfw_source or args.scarlet_source),
+    graphics = build_graphics(source, glfw, scarlet, scarlet_ui, out, lib, classes, builtins[0], env, run)
+    receipt = {'graphics': graphics, 'elf': elf, 'version': args.version, 'source': str(source), 'local_source': bool(args.source or args.glfw_source or args.scarlet_source or args.scarlet_ui_source),
                'image': str(stage), 'core': str(lib), 'sources': spec,
                'toolchain': {k: env[k] for k in ('SCARLET_NATIVE_CC', 'SCARLET_NATIVE_RUNTIME', 'SCARLET_LLVM_SOURCE', 'SCARLET_RUSTC', 'JAVA_HOME')},
                'producer_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -142,6 +143,7 @@ if __name__ == '__main__':
     p.add_argument('--version', default='3.4.3')
     p.add_argument('--source', type=Path, help='Development checkout; not eligible for release')
     p.add_argument('--glfw-source', type=Path, help='Development GLFW checkout; not eligible for release')
+    p.add_argument('--scarlet-ui-source', type=Path, help='Development ScarletUI checkout; not eligible for release')
     p.add_argument('--scarlet-source', type=Path, help='Development SWS checkout; not eligible for release')
     p.add_argument('--output', type=Path, required=True, help='New output directory')
     p.add_argument('--jobs', type=int, default=4)
