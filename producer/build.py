@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a pinned LWJGL core JAR and Scarlet AArch64 native library."""
+"""Build pinned LWJGL core/GLFW/Vulkan modules and Scarlet native libraries."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
@@ -11,6 +11,7 @@ import subprocess
 import tarfile
 import urllib.request
 from audit import audit
+from graphics import build_graphics
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / 'producer/cache'
@@ -57,6 +58,8 @@ def build(args):
         env.pop(name, None)
     source = args.source.resolve() if args.source else extract(
         download(spec['lwjgl'], spec['lwjgl']['commit'] + '.tar.gz'), out / 'lwjgl-source')
+    glfw = args.glfw_source.resolve() if args.glfw_source else extract(download(spec['glfw'], spec['glfw']['commit'] + '.tar.gz'), out / 'glfw-source')
+    scarlet = args.scarlet_source.resolve() if args.scarlet_source else extract(download(spec['scarlet'], spec['scarlet']['commit'] + '.tar.gz'), out / 'scarlet-source')
     core = source / 'modules/lwjgl/core/src'
     for name, header in spec['jni_headers'].items(): download(header, name)
     annotations = download(spec['jspecify'], 'jspecify-1.0.0.jar')
@@ -124,7 +127,8 @@ def build(args):
     shutil.copyfile(rust_root / 'lib/rustlib/src/rust/library/compiler-builtins/LICENSE.txt', legal / 'compiler-builtins.txt')
     shutil.copyfile(ROOT / 'LICENSE', legal / 'producer.txt')
     (legal / 'sources.json').write_text(json.dumps(spec, indent=2) + '\n')
-    receipt = {'elf': elf, 'version': args.version, 'source': str(source), 'local_source': bool(args.source),
+    graphics = build_graphics(source, glfw, scarlet, out, lib, classes, builtins[0], env, run)
+    receipt = {'graphics': graphics, 'elf': elf, 'version': args.version, 'source': str(source), 'local_source': bool(args.source or args.glfw_source or args.scarlet_source),
                'image': str(stage), 'core': str(lib), 'sources': spec,
                'toolchain': {k: env[k] for k in ('SCARLET_NATIVE_CC', 'SCARLET_NATIVE_RUNTIME', 'SCARLET_LLVM_SOURCE', 'SCARLET_RUSTC', 'JAVA_HOME')},
                'producer_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -137,6 +141,8 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--version', default='3.4.3')
     p.add_argument('--source', type=Path, help='Development checkout; not eligible for release')
+    p.add_argument('--glfw-source', type=Path, help='Development GLFW checkout; not eligible for release')
+    p.add_argument('--scarlet-source', type=Path, help='Development SWS checkout; not eligible for release')
     p.add_argument('--output', type=Path, required=True, help='New output directory')
     p.add_argument('--jobs', type=int, default=4)
     build(p.parse_args())

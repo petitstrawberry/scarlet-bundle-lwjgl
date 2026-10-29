@@ -23,6 +23,11 @@ def verify(root, receipt):
     core = root / 'usr/lib/lwjgl' / receipt['version']
     if audit(core / 'liblwjgl.so') != receipt['elf']:
         raise ValueError('ELF audit changed')
+    if 'graphics' in receipt:
+        if audit(core / 'libglfw.so', 'glfw') != receipt['graphics']['glfw']: raise ValueError('GLFW audit changed')
+        for module, cls in [('glfw', 'GLFW'), ('vulkan', 'VK')]:
+            with zipfile.ZipFile(core / ('lwjgl-' + module + '.jar')) as jar:
+                if 'org/lwjgl/' + module + '/' + cls + '.class' not in jar.namelist(): raise ValueError('Missing module class')
     with zipfile.ZipFile(core / 'lwjgl.jar') as jar:
         for name in ('org/lwjgl/system/scarlet/ScarletLibrary.class', 'org/lwjgl/system/MemoryUtil.class', 'org/lwjgl/system/JNI.class'):
             if name not in jar.namelist(): raise ValueError('Missing core class: ' + name)
