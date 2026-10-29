@@ -28,6 +28,15 @@ def verify(root, receipt):
         for module, cls in [('glfw', 'GLFW'), ('vulkan', 'VK')]:
             with zipfile.ZipFile(core / ('lwjgl-' + module + '.jar')) as jar:
                 if 'org/lwjgl/' + module + '/' + cls + '.class' not in jar.namelist(): raise ValueError('Missing module class')
+    if 'applications' in receipt:
+        applications = receipt['applications']
+        for name, profile in applications['profiles'].items():
+            if audit(core / name, profile) != applications['elf'][name]:
+                raise ValueError('Native module audit changed: ' + name)
+        for module in applications['modules']:
+            with zipfile.ZipFile(core / ('lwjgl-' + module + '.jar')) as jar:
+                if not any(name.endswith('.class') for name in jar.namelist()):
+                    raise ValueError('Empty native module jar: ' + module)
     with zipfile.ZipFile(core / 'lwjgl.jar') as jar:
         for name in ('org/lwjgl/system/scarlet/ScarletLibrary.class', 'org/lwjgl/system/MemoryUtil.class', 'org/lwjgl/system/JNI.class'):
             if name not in jar.namelist(): raise ValueError('Missing core class: ' + name)

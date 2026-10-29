@@ -21,11 +21,12 @@
   "lwjgl": {
     "repository": "https://github.com/petitstrawberry/lwjgl3",
     "branch": "scarlet-3.4.3",
-    "commit": "7095c8df7a302f00ba60fe1e083315f6f8f2efec",
+    "commit": "4dde2289d078a08613a9adb416431d7592aa6d22",
     "upstream_tag": "3.4.3",
     "upstream_commit": "30fac9b95f99cda97312232be25ba55297bf9951",
-    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/7095c8df7a302f00ba60fe1e083315f6f8f2efec",
-    "sha256": "e75d878a5f4d5b94b28b18cd293af918c88aaf9f7acf614569687471deaed9b6"
+    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/4dde2289d078a08613a9adb416431d7592aa6d22",
+    "sha256": "860f116018a02e94e497b1f0a8ce4fb7b539747ec0dd0bb1392d179d86568809",
+    "upstream_version": "3.4.3"
   },
   "llvm": {
     "repository": "https://github.com/petitstrawberry/llvm-project",
@@ -62,5 +63,81 @@
     "commit": "409b91758b67a0084f411b133c885a88e54b1461",
     "url": "https://codeload.github.com/petitstrawberry/scarlet-ui/tar.gz/409b91758b67a0084f411b133c885a88e54b1461",
     "sha256": "1b5b6e32e586b58a858c7e7c24fc1e558de3f205bcadaf99b0be9ec98eeb0437"
+  },
+  "sdl": {
+    "repository": "https://github.com/petitstrawberry/SDL",
+    "commit": "8c48a41fc3769851e545e39ff92d3e984f3f0b80",
+    "url": "https://codeload.github.com/petitstrawberry/SDL/tar.gz/8c48a41fc3769851e545e39ff92d3e984f3f0b80",
+    "sha256": "51ed37795cf6d2b5c485188187a52ab7661cfa9cf3faeb6470dafebdd01b9d9b",
+    "branch": "scarlet-3.4",
+    "upstream_version": "3.4.18",
+    "upstream_commit": "829a65d769d935c4852f8159e964312c0957260a"
+  },
+  "freetype": {
+    "repository": "https://github.com/freetype/freetype",
+    "commit": "526ec5c47b9ebccc4754c85ac0c0cdf7c85a5e9b",
+    "url": "https://codeload.github.com/freetype/freetype/tar.gz/526ec5c47b9ebccc4754c85ac0c0cdf7c85a5e9b",
+    "sha256": "d24f53b60034dc5c48e90d122d432a8f04a05b9e0a98c8d8e49b4a759207ce2e",
+    "upstream_version": "2.14.1"
+  },
+  "vulkan_headers": {
+    "repository": "https://github.com/KhronosGroup/Vulkan-Headers",
+    "commit": "6802bb4733b63ed5efd3adb308a6c885ef180ea1",
+    "url": "https://codeload.github.com/KhronosGroup/Vulkan-Headers/tar.gz/6802bb4733b63ed5efd3adb308a6c885ef180ea1",
+    "sha256": "9044fbb356160e43201dc2094acb44c8a906722a63a35f48fc0f051579db9bb6",
+    "upstream_version": "1.4.363"
+  },
+  "shaderc": {
+    "repository": "https://github.com/google/shaderc",
+    "commit": "b64fd42c4a2a9d501c47aca5d3571f7673a5e9cc",
+    "url": "https://codeload.github.com/google/shaderc/tar.gz/b64fd42c4a2a9d501c47aca5d3571f7673a5e9cc",
+    "sha256": "b0f73c2f50df5f24e78fae6d04f1e95131c65ea3ea13fd8998a317a5d632a51f",
+    "upstream_version": "2026.4"
+  },
+  "glslang": {
+    "repository": "https://github.com/petitstrawberry/glslang",
+    "commit": "cf2282d4d12077919bb975ce4d6b4b8940537147",
+    "url": "https://codeload.github.com/petitstrawberry/glslang/tar.gz/cf2282d4d12077919bb975ce4d6b4b8940537147",
+    "sha256": "95db2fc9fb2d21c39b5324281f04acf3df1ada9b8186e4322a29224601d84118",
+    "branch": "scarlet",
+    "upstream_commit": "e1b562a8bed273a02f30b59b66a5d499793cede5"
+  },
+  "spirv_tools": {
+    "repository": "https://github.com/KhronosGroup/SPIRV-Tools",
+    "commit": "ef96ed763b43b59b33b31b362f09a02b729fa1c9",
+    "url": "https://codeload.github.com/KhronosGroup/SPIRV-Tools/tar.gz/ef96ed763b43b59b33b31b362f09a02b729fa1c9",
+    "sha256": "82c62146083fd558735a3171cf97cfc47903ca7d368482e87f94bd44883c0f00"
+  },
+  "spirv_headers": {
+    "repository": "https://github.com/KhronosGroup/SPIRV-Headers",
+    "commit": "04fd3caa1e8267e4d95c806cad901181728e1006",
+    "url": "https://codeload.github.com/KhronosGroup/SPIRV-Headers/tar.gz/04fd3caa1e8267e4d95c806cad901181728e1006",
+    "sha256": "392f4801409aad9c4f1b77745f179952fd6264e4c8bd0fc1bc45dfa6807bf6d0"
+  },
+  "spirv_cross": {
+    "repository": "https://github.com/petitstrawberry/SPIRV-Cross",
+    "commit": "b6d12e2e6e3f9fd32d89d577ae6f7c33b74f76f9",
+    "url": "https://codeload.github.com/petitstrawberry/SPIRV-Cross/tar.gz/b6d12e2e6e3f9fd32d89d577ae6f7c33b74f76f9",
+    "sha256": "8034c530c189b3ba49f2aea2d7f0255685b14a47767d93d6392def9fc4b4aaec",
+    "branch": "scarlet",
+    "upstream_version": "vulkan-sdk-1.4.363.0",
+    "upstream_commit": "f11ba9f0b21ba8fc15153d50a2a1ae31ab1cf8f7"
+  },
+  "openal": {
+    "repository": "https://github.com/petitstrawberry/openal-soft",
+    "commit": "5307b77581d2fb6cede72b555de5780b3833072a",
+    "url": "https://codeload.github.com/petitstrawberry/openal-soft/tar.gz/5307b77581d2fb6cede72b555de5780b3833072a",
+    "sha256": "612a24dba2dc984bfff58b2be471ea89701244bc8d22f62818bcaad8a73a1706",
+    "branch": "scarlet-1.19",
+    "upstream_version": "1.19.1",
+    "upstream_commit": "6761218e51699f46bf25c377e65b3e9ea5e434b9"
+  },
+  "glvnd": {
+    "repository": "https://github.com/petitstrawberry/libglvnd",
+    "commit": "30b88d15ad35db2f9eabe6eeadc3d7f0184052d9",
+    "url": "https://codeload.github.com/petitstrawberry/libglvnd/tar.gz/30b88d15ad35db2f9eabe6eeadc3d7f0184052d9",
+    "sha256": "783576769fa702881a4d1ff19a561930a0b82c4c96902791a7bba93edd620b25",
+    "branch": "scarlet",
+    "upstream_version": "1.7.0"
   }
 }

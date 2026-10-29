@@ -1,5 +1,47 @@
 # Native core validation
 
+## Application module producer
+
+The producer also builds SDL3, STB, FreeType, shaderc, SPIRV-Cross, VMA,
+OpenAL and OpenGL bindings from the immutable source revisions in
+`versions/3.4.3/sources.json`. Native changes live in the corresponding forks.
+The bundle contains build recipes and artifact references. SWS and ScarletUI
+remain platform runtime dependencies; their link inputs are built from the
+pinned sources and are not copied into the LWJGL payload.
+
+`native-contracts.json` fixes the verified import/dependency and public export
+contracts for each library. New imports require native validation before the
+contract changes. The release verifier repeats these audits after extracting
+the archive. The checks reject DSO TLS, build RPATH, unsupported relocation
+types, hidden shader API mistakes and exported private runtime symbols.
+
+The headless application suite exercises SDL loading, PNG decode and thread
+flags, font rasterization, GLSL-to-SPIR-V compilation, reflection and compiler
+diagnostics across four threads, PCM loopback mixing/error reporting, OpenGL
+dispatch loading/context rejection, and VMA library initialization:
+
+```sh
+nix develop --command python3 producer/tests/validate_applications.py \
+  --kernel /path/to/Image --init /path/to/init --loader /path/to/scarlet-ld \
+  --java /path/to/java --java-home /path/to/openjdk-25 \
+  --core /path/to/runtime/usr/lib/lwjgl/3.4.3 --font /path/to/font.ttf \
+  --sws-client /path/to/libsws_client_c.so \
+  --scarlet-ui /path/to/libscarlet_ui_window.so \
+  --qemu /path/to/qemu-system-aarch64 \
+  --output producer/artifacts/application-modules/hvf
+```
+
+The VM uses HVF, ephemeral test state and no network or disk. The result records
+all runtime input hashes and checks every success marker and process exit.
+It does not test SDL presentation or GPU memory allocation; those require a
+graphics guest. OpenAL currently uses the C implementation in 1.19.1 with
+loopback/null support and no native hardware playback/capture backend. OpenGL
+provides dispatch without a rendering vendor. SPIRV-Cross uses its upstream
+exceptions-to-assertions profile; malformed input may abort.
+
+The earlier validation records below concern the specific artifacts and
+source revisions named in each section.
+
 On 2026-10-29, the LWJGL 3.4.3 Scarlet port at
 `0c092dbfc3221c5a25e3657e1b0954779f2e5ff2` passed on a diskless native Scarlet
 AArch64 guest using HVF on Apple Silicon. No TCG run was used.

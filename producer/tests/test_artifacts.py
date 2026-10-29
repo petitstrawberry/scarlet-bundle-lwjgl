@@ -65,4 +65,22 @@ class ArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'clean producer'):
                 release.package(receipt, 'v0.1.1', self.root / 'release')
 
+    def test_shader_api_requires_exported_entrypoints_and_private_runtime(self):
+        path = self.root / 'shaderc.so'
+        data = bytearray(64); data[:8] = b'\x7fELF\x02\x01\x01\x53'
+        struct.pack_into('<HH', data, 16, 3, 183); path.write_bytes(data)
+        exports = '\n'.join('T ' + name for name in audit.NATIVE_PROFILES['shaderc']['required_exports'])
+        for definitions in ('', exports + '\nT malloc'):
+            with patch.object(audit.subprocess, 'check_output', side_effect=['', '', definitions]), self.assertRaises(ValueError):
+                audit.audit(path, 'shaderc')
+        with patch.object(audit.subprocess, 'check_output', side_effect=['', 'U unverified_helper']), self.assertRaisesRegex(ValueError, 'Unverified'):
+            audit.audit(path, 'shaderc')
+
+    def test_sdl_requires_both_native_window_dependencies(self):
+        path = self.root / 'sdl.so'
+        data = bytearray(64); data[:8] = b'\x7fELF\x02\x01\x01\x53'
+        struct.pack_into('<HH', data, 16, 3, 183); path.write_bytes(data)
+        with patch.object(audit.subprocess, 'check_output', return_value='(NEEDED) [libsws_client_c.so]'), self.assertRaisesRegex(ValueError, 'dependencies'):
+            audit.audit(path, 'sdl')
+
 if __name__ == '__main__': unittest.main()

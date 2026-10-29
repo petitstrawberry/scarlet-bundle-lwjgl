@@ -24,7 +24,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
@@ -35,7 +35,7 @@ jobs:
           name: scarlet-rust-toolchain
       - name: Check producer
         run: python3 -m unittest discover -s producer/tests -p 'test_*.py'
-      - name: Build pinned core, GLFW and Vulkan bindings
+      - name: Build pinned native runtime and application bindings
         run: nix develop --command python3 producer/build.py --output producer/.build/ci --jobs 4
       - name: Package and verify archive
         env:
