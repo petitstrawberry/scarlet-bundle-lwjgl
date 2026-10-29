@@ -12,7 +12,9 @@ def build_graphics(source, glfw, scarlet, out, lib, core_classes, builtins, env,
     logs = out / 'logs'
     sws_target = out / 'sws-target'
     sws_env = dict(env, CARGO_TARGET_DIR=str(sws_target))
-    run(['cargo', 'build', '--locked', '--manifest-path', scarlet / 'user/lib/sws-client-c/Cargo.toml',
+    # This library has only in-tree path dependencies and no published lockfile.
+    # Generate its lock offline from the immutable Scarlet source archive.
+    run(['cargo', 'build', '--offline', '--manifest-path', scarlet / 'user/lib/sws-client-c/Cargo.toml',
          '--release', '--target', 'aarch64-unknown-scarlet'], out, logs / 'sws.log', sws_env)
     sws = sws_target / 'aarch64-unknown-scarlet/release'
     cc = env['SCARLET_NATIVE_CC']

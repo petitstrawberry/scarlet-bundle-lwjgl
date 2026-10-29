@@ -46,8 +46,8 @@
     "commit": "cfe5719d95517bb1be8a22f50f3e5e526a945edb",
     "url": "https://codeload.github.com/petitstrawberry/glfw/tar.gz/cfe5719d95517bb1be8a22f50f3e5e526a945edb",
     "sha256": "8545a99d25e2ab76b2dbf49f1176eab8067326eb930760956c5139937fc212a4",
-    "upstream_tag": "3.5.1-dev",
-    "upstream_commit": "d9d6f0f1f967807ffade6598ea9a631ebaf37a56"
+    "upstream_commit": "d9d6f0f1f967807ffade6598ea9a631ebaf37a56",
+    "upstream_version": "3.5.1-dev"
   },
   "scarlet": {
     "repository": "https://github.com/petitstrawberry/Scarlet",
