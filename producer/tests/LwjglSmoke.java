@@ -56,6 +56,11 @@ public final class LwjglSmoke {
             require(library.getFunctionAddress("missing_symbol") == 0, "missing symbol");
             require(library.getPath() == null, "opaque handle path");
             try (MemoryStack stack = MemoryStack.stackPush()) {
+                ByteBuffer unterminated = stack.malloc(3).put(0, (byte)'b').put(1, (byte)'a').put(2, (byte)'d');
+                try { library.getFunctionAddress(unterminated); throw new AssertionError("unterminated symbol accepted"); }
+                catch (IllegalArgumentException expected) { }
+            }
+            try (MemoryStack stack = MemoryStack.stackPush()) {
                 FFICIF cif = FFICIF.malloc(stack);
                 PointerBuffer types = stack.pointers(ffi_type_sint32.address(), ffi_type_sint32.address());
                 require(ffi_prep_cif(cif, FFI_DEFAULT_ABI, ffi_type_sint32, types) == FFI_OK, "CIF");

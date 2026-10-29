@@ -21,11 +21,11 @@
   "lwjgl": {
     "repository": "https://github.com/petitstrawberry/lwjgl3",
     "branch": "scarlet-3.4.3",
-    "commit": "4b9edd50e1892e62b73d3dcfcbcc2c63897719d7",
+    "commit": "0c092dbfc3221c5a25e3657e1b0954779f2e5ff2",
     "upstream_tag": "3.4.3",
     "upstream_commit": "30fac9b95f99cda97312232be25ba55297bf9951",
-    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/4b9edd50e1892e62b73d3dcfcbcc2c63897719d7",
-    "sha256": "3b38e5dcc230000769094a03b929e7b72e3c6641fb592fd75d9dc87ba3df40b4"
+    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/0c092dbfc3221c5a25e3657e1b0954779f2e5ff2",
+    "sha256": "1b63d7b2ed7e0cda17cc78e7ec53b5935a41814f41dc790ded3dff0ce9ff08a7"
   },
   "llvm": {
     "repository": "https://github.com/petitstrawberry/llvm-project",
