@@ -1,0 +1,80 @@
+name: Build LWJGL core
+on:
+  push:
+    paths:
+      - 'producer/**'
+      - '!producer/tests/**'
+      - '!producer/VALIDATION.md'
+      - 'versions/**'
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'LICENSE'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Fresh artifact version (empty uses the workflow run number)
+        default: ''
+      publish:
+        type: boolean
+        description: Publish and update bundle pins on main
+        default: true
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: accept-flake-config = true
+      - uses: cachix/cachix-action@v17
+        with:
+          name: scarlet-rust-toolchain
+      - name: Check producer
+        run: python3 -m unittest discover -s producer/tests -p 'test_*.py'
+      - name: Build pinned core
+        run: nix develop --command python3 producer/build.py --output producer/.build/ci --jobs 4
+      - name: Package and verify archive
+        env:
+          VERSION: ${{ inputs.version || format('v0.1.{0}', github.run_number) }}
+        run: |
+          nix develop --command python3 producer/release.py \
+            --build-receipt producer/.build/ci/build.json \
+            --version "$VERSION" --output producer/artifacts/release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lwjgl-3.4.3
+          path: producer/artifacts/release/
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-logs
+          path: producer/.build/ci/logs/
+  publish:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: lwjgl-release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: lwjgl-3.4.3
+          path: producer/artifacts/release
+      - name: Publish and pin verified archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python3 producer/publish.py --artifacts producer/artifacts/release

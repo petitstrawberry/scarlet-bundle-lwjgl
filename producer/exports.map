@@ -1,0 +1,4 @@
+{
+    global: Java_*; JNI_OnLoad; JNI_OnUnload; org_lwjgl_*;
+    local: *;
+};

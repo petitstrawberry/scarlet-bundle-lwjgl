@@ -1,0 +1,43 @@
+{
+  "version": "3.4.3",
+  "libffi": {
+    "url": "https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz",
+    "sha256": "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4"
+  },
+  "jspecify": {
+    "url": "https://repo.maven.apache.org/maven2/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar",
+    "sha256": "1fad6e6be7557781e4d33729d49ae1cdc8fdda6fe477bb0cc68ce351eafdfbab"
+  },
+  "jni_headers": {
+    "jni.h": {
+      "url": "https://raw.githubusercontent.com/petitstrawberry/jdk25u/27cf2dbd8fca4c21daf9f64885ee56ff780854f0/src/java.base/share/native/include/jni.h",
+      "sha256": "1e03bd83d1662ac00647f7a06c11d32333767ee537803ec1d153e89888414520"
+    },
+    "jni_md.h": {
+      "url": "https://raw.githubusercontent.com/petitstrawberry/jdk25u/27cf2dbd8fca4c21daf9f64885ee56ff780854f0/src/java.base/scarlet/native/include/jni_md.h",
+      "sha256": "88cb5c33e306900dd35a78d5a439087123b8e91b0986bb5acb42cc9bd2fcc42e"
+    }
+  },
+  "lwjgl": {
+    "repository": "https://github.com/petitstrawberry/lwjgl3",
+    "branch": "scarlet-3.4.3",
+    "commit": "4b9edd50e1892e62b73d3dcfcbcc2c63897719d7",
+    "upstream_tag": "3.4.3",
+    "upstream_commit": "30fac9b95f99cda97312232be25ba55297bf9951",
+    "url": "https://codeload.github.com/petitstrawberry/lwjgl3/tar.gz/4b9edd50e1892e62b73d3dcfcbcc2c63897719d7",
+    "sha256": "3b38e5dcc230000769094a03b929e7b72e3c6641fb592fd75d9dc87ba3df40b4"
+  },
+  "llvm": {
+    "repository": "https://github.com/petitstrawberry/llvm-project",
+    "commit": "5733bea91affcb26db1f9f4d7459b22c79756c13"
+  },
+  "compiler_builtins": {
+    "repository": "https://github.com/petitstrawberry/rust",
+    "commit": "26d00a8a3a8489d73f5ae3575880e9f915dfd0f2",
+    "path": "library/compiler-builtins"
+  },
+  "jspecify_license": {
+    "url": "https://raw.githubusercontent.com/jspecify/jspecify/b2a10e14bb81c1b7cb6e488c112fe55cb2218d7d/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  }
+}

@@ -1,0 +1,6 @@
+producer/.build/
+producer/cache/
+producer/artifacts/
+__pycache__/
+*.pyc
+result*
