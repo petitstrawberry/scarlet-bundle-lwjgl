@@ -22,7 +22,7 @@ def build_applications(source, scarlet, scarlet_ui, spec, out, lib, core_classes
     sources = {name: extract(download(spec[name], spec[name]['commit'] + '.tar.gz'),
                             out / (name + '-source')) for name in DEPENDENCIES}
     # Prevent upstream version probes from finding the producer's parent Git repo.
-    native_env = dict(env, GIT_CEILING_DIRECTORIES=str(out))
+    native_env = dict(env, GIT_CEILING_DIRECTORIES=str(out), SOURCE_DATE_EPOCH='1787443200')
     for name, directory in [('glslang', 'glslang'), ('spirv_tools', 'spirv-tools'),
                             ('spirv_headers', 'spirv-headers')]:
         destination = sources['shaderc'] / 'third_party' / directory
