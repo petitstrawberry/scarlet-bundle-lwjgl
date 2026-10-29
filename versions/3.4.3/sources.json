@@ -66,9 +66,9 @@
   },
   "sdl": {
     "repository": "https://github.com/petitstrawberry/SDL",
-    "commit": "8c48a41fc3769851e545e39ff92d3e984f3f0b80",
-    "url": "https://codeload.github.com/petitstrawberry/SDL/tar.gz/8c48a41fc3769851e545e39ff92d3e984f3f0b80",
-    "sha256": "51ed37795cf6d2b5c485188187a52ab7661cfa9cf3faeb6470dafebdd01b9d9b",
+    "commit": "b326612b682865724d2926fe78d42bcf36c75b7b",
+    "url": "https://codeload.github.com/petitstrawberry/SDL/tar.gz/b326612b682865724d2926fe78d42bcf36c75b7b",
+    "sha256": "b2c718ac20fd2895efb1d54c79f3f434ffe54ccf47585f2d89e491e829217c37",
     "branch": "scarlet-3.4",
     "upstream_version": "3.4.18",
     "upstream_commit": "829a65d769d935c4852f8159e964312c0957260a"
