@@ -1,8 +1,8 @@
 # Generated from the verified CI release archive.
 [[layers]]
 kind = "archive"
-url = "https://github.com/petitstrawberry/scarlet-bundle-lwjgl/releases/download/v0.2.6/lwjgl-3.4.3-aarch64-v0.2.6.tar.gz"
-sha256 = "sha256:8f3b401aa61f878e27e3e1476d289188e1ee832dde87a26bfc63496f215160d3"
+url = "https://github.com/petitstrawberry/scarlet-bundle-lwjgl/releases/download/v0.2.8/lwjgl-3.4.3-aarch64-v0.2.8.tar.gz"
+sha256 = "sha256:164e0abb2599cd7cdf624e25005c0dfda2e8e435010d7b66c6afc3cda6d422c8"
 format = "tar-gz"
 strip_components = 1
 to = "/"
