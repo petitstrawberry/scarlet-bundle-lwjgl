@@ -129,3 +129,9 @@ SGFX `12df11ee00f4af173f191079b9365548b1c60301`, and the SWS client from Scarlet
 [Scarlet PR #614](https://github.com/petitstrawberry/Scarlet/pull/614).
 The release attachment `graphics-validation.json` records all guest input
 hashes and the result. The producer archive contains no kernel or SWS runtime.
+
+[SGFX CI run 40827882875](https://github.com/petitstrawberry/sgfx/actions/runs/40827882875)
+passed on the pinned ICD revision: native AArch64 and RISC-V builds/lints,
+Linux AArch64 WSI checking, and portable tests/lints/documentation with both
+upstream and Scarlet toolchains. Native guest execution above covers AArch64;
+the RISC-V result is a build check.
