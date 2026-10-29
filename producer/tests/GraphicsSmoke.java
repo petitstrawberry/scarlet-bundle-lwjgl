@@ -15,6 +15,7 @@ public class GraphicsSmoke {
     }
     static void require(boolean ok, String message) { if (!ok) throw new AssertionError(message); }
     static int keys, sizes, characters;
+    static int initialFramebufferWidth;
     static void render(VkDevice device, VkQueue queue, long swapchain, long pool, float red, float green) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer value = stack.mallocLong(1);
@@ -58,6 +59,21 @@ public class GraphicsSmoke {
             vkDestroyFence(device, fence, null);
         }
     }
+    static void verifyFrame(long window, boolean decorated, int width, int height) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer w=stack.mallocInt(1), h=stack.mallocInt(1);
+            IntBuffer left=stack.mallocInt(1), top=stack.mallocInt(1), right=stack.mallocInt(1), bottom=stack.mallocInt(1);
+            glfwGetWindowSize(window,w,h);
+            require(w.get(0)==width && h.get(0)==height,"logical content extent");
+            glfwGetWindowFrameSize(window,left,top,right,bottom);
+            require(decorated ? top.get(0)>0 : (left.get(0)|top.get(0)|right.get(0)|bottom.get(0))==0,"frame insets");
+            FloatBuffer sx=stack.mallocFloat(1), sy=stack.mallocFloat(1);
+            glfwGetWindowContentScale(window,sx,sy);
+            glfwGetFramebufferSize(window,w,h);
+            require(w.get(0)==(int)Math.ceil(width*sx.get(0)) && h.get(0)==(int)Math.ceil(height*sy.get(0)),"physical content extent");
+            initialFramebufferWidth=w.get(0);
+        }
+    }
     static long swapchain(VkPhysicalDevice physical, VkDevice device, long surface, long old) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkSurfaceCapabilitiesKHR caps = VkSurfaceCapabilitiesKHR.calloc(stack);
@@ -81,6 +97,15 @@ public class GraphicsSmoke {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         long window = glfwCreateWindow(320, 240, "LWJGL Vulkan", 0, 0);
         require(window != 0, "window");
+        verifyFrame(window,true,320,240);
+        glfwSetWindowAttrib(window,GLFW_DECORATED,GLFW_FALSE);
+        verifyFrame(window,false,320,240);
+        glfwSetWindowAttrib(window,GLFW_DECORATED,GLFW_TRUE);
+        verifyFrame(window,true,320,240);
+        glfwSetWindowAttrib(window,GLFW_RESIZABLE,GLFW_FALSE);
+        glfwSetWindowAttrib(window,GLFW_RESIZABLE,GLFW_TRUE);
+        glfwSetWindowTitle(window,"ScarletUI Vulkan window");
+        System.out.println("GRAPHICS frame toggles and content scale PASS");
         GLFWKeyCallback key = GLFWKeyCallback.create((w, k, scan, action, mods) -> { if (k == GLFW_KEY_A && action == GLFW_PRESS) keys++; });
         GLFWFramebufferSizeCallback size = GLFWFramebufferSizeCallback.create((w, x, y) -> sizes++);
         GLFWCharCallback text = GLFWCharCallback.create((w, codepoint) -> { if (codepoint == 'a') characters++; });
@@ -122,11 +147,15 @@ public class GraphicsSmoke {
             require(count.get(0) == 1, "one rectangle");
             VkRect2D.Buffer rectangles = VkRect2D.calloc(1, stack);
             check(vkGetPhysicalDevicePresentRectanglesKHR(physical, surface, count, rectangles), "rectangles");
-            require(rectangles.get(0).extent().width() == 320, "rectangle width");
+            require(rectangles.get(0).extent().width() == initialFramebufferWidth, "rectangle width");
             vkGetDeviceQueue(device, 0, 0, pointer); VkQueue queue = new VkQueue(pointer.get(0), device);
             check(vkCreateCommandPool(device, VkCommandPoolCreateInfo.calloc(stack).sType$Default().queueFamilyIndex(0), null, handle), "pool");
             long pool = handle.get(0), chain = swapchain(physical, device, surface, 0);
-            for (int i = 0; i < 6; i++) { render(device, queue, chain, pool, .8f, .1f); glfwPollEvents(); Thread.sleep(80); }
+            for (int i = 0; i < 6; i++) {
+                render(device, queue, chain, pool, .8f, .1f);
+                glfwSetWindowTitle(window,"Frame repaint " + i);
+                glfwPollEvents(); Thread.sleep(80);
+            }
             glfwSetWindowSize(window, 384, 256);
             for (int i = 0; i < 10; i++) { glfwPollEvents(); Thread.sleep(30); }
             check(vkCreateFence(device, VkFenceCreateInfo.calloc(stack).sType$Default(), null, handle), "resize fence");
@@ -147,6 +176,20 @@ public class GraphicsSmoke {
             IntBuffer width = stack.mallocInt(1), height = stack.mallocInt(1);
             glfwGetWindowSize(window, width, height);
             require(width.get(0) == 384 && height.get(0) == 256, "surface destruction preserves the GLFW window");
+            verifyFrame(window,true,384,256);
+            long monitor=glfwGetPrimaryMonitor();
+            GLFWVidMode mode=glfwGetVideoMode(monitor);
+            glfwSetWindowMonitor(window,monitor,0,0,mode.width(),mode.height(),GLFW_DONT_CARE);
+            for (int i=0;i<10;i++) { glfwPollEvents(); Thread.sleep(20); }
+            IntBuffer l=stack.mallocInt(1), t=stack.mallocInt(1), r=stack.mallocInt(1), b=stack.mallocInt(1);
+            glfwGetWindowFrameSize(window,l,t,r,b);
+            require((l.get(0)|t.get(0)|r.get(0)|b.get(0))==0,"fullscreen has no chrome");
+            glfwGetFramebufferSize(window,width,height);
+            require(width.get(0)==mode.width() && height.get(0)==mode.height(),"fullscreen framebuffer extent");
+            glfwSetWindowMonitor(window,0,0,0,384,256,GLFW_DONT_CARE);
+            for (int i=0;i<10;i++) { glfwPollEvents(); Thread.sleep(20); }
+            verifyFrame(window,true,384,256);
+            System.out.println("GRAPHICS fullscreen restore PASS");
         }
         glfwDestroyWindow(window); glfwTerminate(); key.free(); size.free(); text.free(); errors.free();
         System.out.println("GRAPHICS PASS windows resize input swapchain present destroy");

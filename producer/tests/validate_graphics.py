@@ -14,9 +14,10 @@ HERE = Path(__file__).resolve().parent
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    for name in ('kernel', 'init', 'loader', 'java', 'java-home', 'core', 'desktop', 'vulkan', 'icd', 'sws-client', 'driver', 'output'):
+    for name in ('kernel', 'init', 'loader', 'java', 'java-home', 'core', 'desktop', 'vulkan', 'icd', 'sws-client', 'scarlet-ui', 'driver', 'output'):
         p.add_argument('--' + name, type=Path, required=True)
     p.add_argument('--qemu', required=True)
+    p.add_argument('--scale', type=float, default=1.0)
     p.add_argument('--timeout', type=int, default=180)
     p.add_argument('--input-delay', type=float, default=0, help='Seconds to retain the rendered window for visual inspection (0..45)')
     a = p.parse_args()
@@ -48,6 +49,7 @@ def main():
     add(a.init, 'init', True); add(a.loader, 'bin/scarlet-ld', True); add(a.java, 'bin/java', True)
     add(out / 'supervisor', 'bin/graphics-test', True)
     add(a.vulkan, 'lib/libvulkan.so.1', True); add(a.icd, 'lib/libvulkan_sgfx.so', True)
+    add(a.scarlet_ui, 'lib/libscarlet_ui_window.so', True)
     add(a.sws_client, 'lib/libsws_client_c.so', True); add(a.driver, 'lib/sgfx/libsgfx_scarlet_virgl.so', True)
     for path in a.core.iterdir():
         if path.suffix == '.jar': add(path, 'app/' + path.name)
@@ -59,7 +61,7 @@ def main():
         entries[name] = (0o40755, b'')
     entries['share/vulkan/icd.d/sgfx.json'] = (0o100644, json.dumps({'file_format_version':'1.0.0','ICD':{'library_path':'/lib/libvulkan_sgfx.so','api_version':'1.1.0'}}).encode())
     entries['lib/sgfx/scarlet-virgl.sgfx-driver'] = (0o100644, b'abi=2\nname=scarlet-virgl\ngpu_backend=virtio-gpu\nlibrary=libsgfx_scarlet_virgl.so\n')
-    entries['etc/sws/config.toml'] = (0o100644, b'[output]\nscale = 1.0\n')
+    entries['etc/sws/config.toml'] = (0o100644, f'[output]\nscale = {a.scale}\n'.encode())
     image = out / 'initramfs.cpio'; archive([(n, *v) for n,v in sorted(entries.items())], image)
     qmp = Path('/tmp/lwjgl-graphics-' + str(os.getpid()) + '.sock')
     command = [a.qemu, '-machine', 'virt,gic-version=3', '-accel', 'hvf', '-cpu', 'host', '-m', '4G', '-smp', '4',
