@@ -192,3 +192,26 @@ A logical 320×240 content area produces a 320×240 or 640×480 swapchain;
 out-of-date, and frame-only repaints preserve the GPU buffer release contract.
 The GL QEMU display does not support this harness's screendump request, so
 these results establish functional behavior, not screenshot-based appearance.
+
+## Native application modules
+
+`producer/tests/validate_applications.py` accepts explicit `--kernel`, `--init`,
+`--loader`, `--java`, `--java-home`, `--core`, `--font`, `--sws-client`,
+`--scarlet-ui`, `--qemu` and `--output` inputs. It runs SDL initialization,
+thread-local STB image decoding, FreeType rasterization, concurrent shaderc
+compilation and SPIRV-Cross reflection, OpenAL loopback rendering, OpenGL
+provider loading and VMA provider loading in an isolated AArch64 HVF guest.
+The font must be a TrueType font containing a visible Latin `A` glyph.
+
+Use `validate_graphics.py --binding sdl` with the same explicit graphics inputs
+as the GLFW test to exercise SDL windows, decoration changes, Vulkan surface
+and swapchain creation, present, resize and injected keyboard/text input.
+It also allocates, maps, writes, flushes, invalidates and frees a real Vulkan
+buffer through VMA. Both graphics variants require level 4 compilation of the
+render and swapchain methods; methods may subsequently deoptimize.
+
+The OpenAL build supports loopback rendering; hardware playback and capture
+are not implemented. OpenGL dispatch loading is verified, but no vendor
+renderer or OpenGL window context is supplied. The Vulkan frontend remains a
+bounded, non-conformant implementation; these checks do not establish general
+application compatibility.
