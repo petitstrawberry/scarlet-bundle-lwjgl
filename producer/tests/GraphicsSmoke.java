@@ -139,7 +139,7 @@ public class GraphicsSmoke {
             for (int i = 0; i < 8; i++) { render(device, queue, chain, pool, .1f, .8f); glfwPollEvents(); Thread.sleep(80); }
             require(sizes > 0, "resize callback");
             System.out.println("GRAPHICS READY_INPUT");
-            for (int i = 0; i < 200 && keys == 0; i++) glfwWaitEventsTimeout(.05);
+            for (int i = 0; i < 1200 && keys == 0; i++) glfwWaitEventsTimeout(.05);
             require(keys > 0 && characters > 0, "key and text callbacks");
             check(vkDeviceWaitIdle(device), "device idle");
             vkDestroySwapchainKHR(device, chain, null); vkDestroyCommandPool(device, pool, null);

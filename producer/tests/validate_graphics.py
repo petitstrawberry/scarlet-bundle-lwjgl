@@ -18,7 +18,10 @@ def main():
         p.add_argument('--' + name, type=Path, required=True)
     p.add_argument('--qemu', required=True)
     p.add_argument('--timeout', type=int, default=180)
-    a = p.parse_args(); out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
+    p.add_argument('--input-delay', type=float, default=0, help='Seconds to retain the rendered window for visual inspection (0..45)')
+    a = p.parse_args()
+    if not 0 <= a.input_delay <= 45: p.error('--input-delay must be in 0..45')
+    out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
     env = dict(os.environ, LC_ALL='C')
     def run(command, name):
         with (out / name).open('w') as log: subprocess.run([str(x) for x in command], check=True, env=env, stdout=log, stderr=subprocess.STDOUT)
@@ -71,6 +74,7 @@ def main():
             while process.poll() is None and time.monotonic()-start < a.timeout:
                 text = (out / 'qemu.log').read_text(errors='replace')
                 if 'GRAPHICS READY_INPUT' in text and not sent:
+                    time.sleep(a.input_delay)
                     connection = socket.socket(socket.AF_UNIX); connection.settimeout(5); connection.connect(str(qmp))
                     stream = connection.makefile('rwb', buffering=0)
                     json.loads(stream.readline())
