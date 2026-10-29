@@ -129,6 +129,11 @@ public class GraphicsSmoke {
             for (int i = 0; i < 6; i++) { render(device, queue, chain, pool, .8f, .1f); glfwPollEvents(); Thread.sleep(80); }
             glfwSetWindowSize(window, 384, 256);
             for (int i = 0; i < 10; i++) { glfwPollEvents(); Thread.sleep(30); }
+            check(vkCreateFence(device, VkFenceCreateInfo.calloc(stack).sType$Default(), null, handle), "resize fence");
+            long resizeFence = handle.get(0);
+            require(vkAcquireNextImageKHR(device, chain, 0, 0, resizeFence, count) == VK_ERROR_OUT_OF_DATE_KHR,
+                "old swapchain is out of date after resize");
+            vkDestroyFence(device, resizeFence, null);
             long replacement = swapchain(physical, device, surface, chain);
             vkDestroySwapchainKHR(device, chain, null); chain = replacement;
             for (int i = 0; i < 8; i++) { render(device, queue, chain, pool, .1f, .8f); glfwPollEvents(); Thread.sleep(80); }
@@ -139,6 +144,9 @@ public class GraphicsSmoke {
             check(vkDeviceWaitIdle(device), "device idle");
             vkDestroySwapchainKHR(device, chain, null); vkDestroyCommandPool(device, pool, null);
             vkDestroyDevice(device, null); vkDestroySurfaceKHR(instance, surface, null); vkDestroyInstance(instance, null);
+            IntBuffer width = stack.mallocInt(1), height = stack.mallocInt(1);
+            glfwGetWindowSize(window, width, height);
+            require(width.get(0) == 384 && height.get(0) == 256, "surface destruction preserves the GLFW window");
         }
         glfwDestroyWindow(window); glfwTerminate(); key.free(); size.free(); text.free(); errors.free();
         System.out.println("GRAPHICS PASS windows resize input swapchain present destroy");
