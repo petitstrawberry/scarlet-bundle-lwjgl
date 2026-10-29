@@ -102,3 +102,30 @@ nix develop --command python3 producer/tests/validate_graphics.py \
 The desktop image must contain SWS, sbusd and their resources. The harness uses
 an isolated initramfs and no network/disk, injects one keyboard event over QMP,
 and shuts the guest down. It requires HVF and GL-capable VirtIO GPU support.
+
+### Published graphics archive
+
+The exact [v0.2.4 CI archive](https://github.com/petitstrawberry/scarlet-bundle-lwjgl/releases/tag/v0.2.4)
+passed the expanded C2 graphics test. [CI run 40827289362](https://github.com/petitstrawberry/scarlet-bundle-lwjgl/actions/runs/40827289362)
+completed its build, ELF/module checks and archive verification. The published
+archive was downloaded again and matched the CI checksum.
+
+| Input | SHA-256 |
+| --- | --- |
+| Release archive | `0f89ce23fb53c7c749b3741b7569ce126c83fd3fc8c77b73e35374dd1424331b` |
+| GLFW native library | `14f65e81ee06125de7143c678cca50a136fe03d899caf2dd72d6e6293b068e69` |
+| LWJGL native core | `1d542db88988e92a3aad0c0a6847bbccc5051e2bd33651fa3282172d0e92bb9d` |
+| GLFW JAR | `bde6089364bf5d3fc1c2891feffeb4248a23c5c4d3bbb57e35e86179a01aab6f` |
+| Vulkan JAR | `5181d989e943526cb9bf9f3360d6b11caacd3857b217aad74d43f51d8830d0d7` |
+| SWS client | `f9f98d301b4c62a4bff52b958bfa2791b41428024a7b801f380099f85664a0a8` |
+| Vulkan loader | `01332ad8da92bf6f183d788f5d4266658f26324e2416d97fac42245365d579ec` |
+| SGFX ICD | `9f6247464d8b257c763436f2368f37d9bd7121a9f9dc4ae626eb4927a3fa751b` |
+| VirGL backend | `f9160d6b636658d2e4efac11e6b9ff5e3ef0da95d89bc92c975351943d014de6` |
+| Guest log | `24c30e08aab562c75ddf65ff43b3412397bab25cabd972b82388deeb7692d454` |
+
+Runtime source revisions: Vulkan-Loader `83f0038b735f08e9a8282ef37b74e1eab1fbf896`,
+SGFX `12df11ee00f4af173f191079b9365548b1c60301`, and the SWS client from Scarlet
+`65f8becaa6f08c33183a085a03efa8608e0dac93`. The native runtime integration is
+[Scarlet PR #614](https://github.com/petitstrawberry/Scarlet/pull/614).
+The release attachment `graphics-validation.json` records all guest input
+hashes and the result. The producer archive contains no kernel or SWS runtime.

@@ -35,9 +35,9 @@ compatible with Scarlet's native ABI. GLFW additionally requires a running SWS
 compositor and the native graphics runtime (`user/lib/scarlet-vulkan` in Scarlet),
 which supplies `/lib/libsws_client_c.so`, `/lib/libvulkan.so.1`, the SGFX ICD and
 its driver manifest. The runtime must include the native SWS surface changes in
-[Scarlet](https://github.com/petitstrawberry/Scarlet/tree/feat/glfw-vulkan-runtime),
-[Vulkan-Loader](https://github.com/petitstrawberry/Vulkan-Loader/tree/feat/scarlet-surface)
-and [SGFX](https://github.com/petitstrawberry/sgfx/tree/feat/native-vulkan-wsi).
+[Scarlet](https://github.com/petitstrawberry/Scarlet/tree/5239a9ac72730072d47e6e9d86c13c8d0e68497c),
+[Vulkan-Loader](https://github.com/petitstrawberry/Vulkan-Loader/tree/83f0038b735f08e9a8282ef37b74e1eab1fbf896)
+and [SGFX](https://github.com/petitstrawberry/sgfx/tree/12df11ee00f4af173f191079b9365548b1c60301).
 The producer builds the pinned SWS client as a link input; its runtime DSO belongs
 to Scarlet's graphics package and is not duplicated in this archive.
 
