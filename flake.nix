@@ -8,7 +8,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     scarlet-rust-toolchain.url = "github:petitstrawberry/scarlet-rust-nix/79f356924d1a93b55904c6b2733d0b3da5ce0de5";
     scarlet-sdk = {
-      url = "github:petitstrawberry/scarlet-sdk/a071222231e8bbd96c1d54f38d99d1b27ec90805";
+      url = "github:petitstrawberry/scarlet-sdk/060bbf9574a4cb5d6296d5478525f3d29973dcee";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.scarlet-rust-toolchain.follows = "scarlet-rust-toolchain";
     };
@@ -27,7 +27,7 @@
               packages = [ rust jdk llvm.clang llvm.llvm pkgs.lld_21
                 pkgs.python3 pkgs.git pkgs.curl pkgs.gnumake pkgs.file
                 pkgs.autoconf pkgs.automake pkgs.libtool pkgs.pkg-config
-                pkgs.gnutar pkgs.gzip ];
+                pkgs.gnutar pkgs.gzip pkgs.cmake pkgs.ninja pkgs.meson ];
               JAVA_HOME = "${jdk.home}";
               SCARLET_LLVM_SOURCE = "${scarlet-sdk.inputs.llvm-src}";
               SCARLET_NATIVE_RUNTIME = "${scarlet-sdk.packages.${system}.scarlet-native-runtime}";

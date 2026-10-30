@@ -1,5 +1,47 @@
 # Native core validation
 
+## Application module producer
+
+The producer also builds SDL3, STB, FreeType, shaderc, SPIRV-Cross, VMA,
+OpenAL and OpenGL bindings from the immutable source revisions in
+`versions/3.4.3/sources.json`. Native changes live in the corresponding forks.
+The bundle contains build recipes and artifact references. SWS and ScarletUI
+remain platform runtime dependencies; their link inputs are built from the
+pinned sources and are not copied into the LWJGL payload.
+
+`native-contracts.json` fixes the verified import/dependency and public export
+contracts for each library. New imports require native validation before the
+contract changes. The release verifier repeats these audits after extracting
+the archive. The checks reject DSO TLS, build RPATH, unsupported relocation
+types, hidden shader API mistakes and exported private runtime symbols.
+
+The headless application suite exercises SDL loading, PNG decode and thread
+flags, font rasterization, GLSL-to-SPIR-V compilation, reflection and compiler
+diagnostics across four threads, PCM loopback mixing/error reporting, OpenGL
+dispatch loading/context rejection, and VMA library initialization:
+
+```sh
+nix develop --command python3 producer/tests/validate_applications.py \
+  --kernel /path/to/Image --init /path/to/init --loader /path/to/scarlet-ld \
+  --java /path/to/java --java-home /path/to/openjdk-25 \
+  --core /path/to/runtime/usr/lib/lwjgl/3.4.3 --font /path/to/font.ttf \
+  --sws-client /path/to/libsws_client_c.so \
+  --scarlet-ui /path/to/libscarlet_ui_window.so \
+  --qemu /path/to/qemu-system-aarch64 \
+  --output producer/artifacts/application-modules/hvf
+```
+
+The VM uses HVF, ephemeral test state and no network or disk. The result records
+all runtime input hashes and checks every success marker and process exit.
+It does not test SDL presentation or GPU memory allocation; those require a
+graphics guest. OpenAL currently uses the C implementation in 1.19.1 with
+loopback/null support and no native hardware playback/capture backend. OpenGL
+provides dispatch without a rendering vendor. SPIRV-Cross uses its upstream
+exceptions-to-assertions profile; malformed input may abort.
+
+The earlier validation records below concern the specific artifacts and
+source revisions named in each section.
+
 On 2026-10-29, the LWJGL 3.4.3 Scarlet port at
 `0c092dbfc3221c5a25e3657e1b0954779f2e5ff2` passed on a diskless native Scarlet
 AArch64 guest using HVF on Apple Silicon. No TCG run was used.
@@ -150,3 +192,40 @@ A logical 320×240 content area produces a 320×240 or 640×480 swapchain;
 out-of-date, and frame-only repaints preserve the GPU buffer release contract.
 The GL QEMU display does not support this harness's screendump request, so
 these results establish functional behavior, not screenshot-based appearance.
+
+## Native application modules
+
+`producer/tests/validate_applications.py` accepts explicit `--kernel`, `--init`,
+`--loader`, `--java`, `--java-home`, `--core`, `--font`, `--sws-client`,
+`--scarlet-ui`, `--qemu` and `--output` inputs. It runs SDL initialization,
+thread-local STB image decoding, FreeType rasterization, concurrent shaderc
+compilation and SPIRV-Cross reflection, OpenAL loopback rendering, OpenGL
+provider loading and VMA provider loading in an isolated AArch64 HVF guest.
+The font must be a TrueType font containing a visible Latin `A` glyph.
+
+Use `validate_graphics.py --binding sdl` with the same explicit graphics inputs
+as the GLFW test to exercise SDL windows, decoration changes, Vulkan surface
+and swapchain creation, present, resize and injected keyboard/text input.
+It also allocates, maps, writes, flushes, invalidates and frees a real Vulkan
+buffer through VMA. Both graphics variants require level 4 compilation of the
+render and swapchain methods; methods may subsequently deoptimize.
+
+The OpenAL build supports loopback rendering; hardware playback and capture
+are not implemented. OpenGL dispatch loading is verified, but no vendor
+renderer or OpenGL window context is supplied. The Vulkan frontend remains a
+bounded, non-conformant implementation; these checks do not establish general
+application compatibility.
+
+On 2026-10-30 the pinned native application sources passed the headless suite
+and the SDL Vulkan/VMA graphics suite with OpenJDK 25 under HVF. The additional
+four-thread loader test validates 128 overlapping missing-library errors.
+These tests require the serialized loader from Scarlet revision
+`6e8f3d0fbf532588b5e9f9606317b3f981f23dab` (or its successor); the older loader
+can reject concurrent first JNI lookups. The loader was built using the
+matching namespaced native Rust TLS runtime.
+
+| Validation input | SHA-256 |
+| --- | --- |
+| Native loader | `3416b48170fcfb0399858a5b5577050fb295d8151b95e36c60ba26e2f86945e7` |
+| Headless guest log | `58072c114c4533dac91d6107a6b10125eb4a6ba3b1d283c0edf5dc9a34a0b9db` |
+| SDL/VMA graphics guest log | `48c1d95936e1c8bc4ff11e05d36b8c90feef63480c3f055a9da025d5332142ea` |

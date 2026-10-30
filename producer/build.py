@@ -12,6 +12,7 @@ import tarfile
 import urllib.request
 from audit import audit
 from graphics import build_graphics
+from applications import build_applications
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / 'producer/cache'
@@ -129,7 +130,9 @@ def build(args):
     shutil.copyfile(ROOT / 'LICENSE', legal / 'producer.txt')
     (legal / 'sources.json').write_text(json.dumps(spec, indent=2) + '\n')
     graphics = build_graphics(source, glfw, scarlet, scarlet_ui, out, lib, classes, builtins[0], env, run)
-    receipt = {'graphics': graphics, 'elf': elf, 'version': args.version, 'source': str(source), 'local_source': bool(args.source or args.glfw_source or args.scarlet_source or args.scarlet_ui_source),
+    applications = build_applications(source, scarlet, scarlet_ui, spec, out, lib, classes,
+                                     builtins[0], env, run, download, extract, args.jobs)
+    receipt = {'applications': applications, 'graphics': graphics, 'elf': elf, 'version': args.version, 'source': str(source), 'local_source': bool(args.source or args.glfw_source or args.scarlet_source or args.scarlet_ui_source),
                'image': str(stage), 'core': str(lib), 'sources': spec,
                'toolchain': {k: env[k] for k in ('SCARLET_NATIVE_CC', 'SCARLET_NATIVE_RUNTIME', 'SCARLET_LLVM_SOURCE', 'SCARLET_RUSTC', 'JAVA_HOME')},
                'producer_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),

@@ -17,6 +17,7 @@ def main():
     for name in ('kernel', 'init', 'loader', 'java', 'java-home', 'core', 'desktop', 'vulkan', 'icd', 'sws-client', 'scarlet-ui', 'driver', 'output'):
         p.add_argument('--' + name, type=Path, required=True)
     p.add_argument('--qemu', required=True)
+    p.add_argument('--binding', choices=('glfw', 'sdl'), default='glfw')
     p.add_argument('--scale', type=float, default=1.0)
     p.add_argument('--timeout', type=int, default=180)
     p.add_argument('--input-delay', type=float, default=0, help='Seconds to retain the rendered window for visual inspection (0..45)')
@@ -24,10 +25,14 @@ def main():
     if not 0 <= a.input_delay <= 45: p.error('--input-delay must be in 0..45')
     out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
     env = dict(os.environ, LC_ALL='C')
+    smoke = 'SdlGraphicsSmoke' if a.binding == 'sdl' else 'GraphicsSmoke'
+    marker = 'SDL_GRAPHICS' if a.binding == 'sdl' else 'GRAPHICS'
+    modules = ('lwjgl.jar', 'lwjgl-' + a.binding + '.jar', 'lwjgl-vulkan.jar')
+    if a.binding == 'sdl': modules += ('lwjgl-vma.jar',)
     def run(command, name):
         with (out / name).open('w') as log: subprocess.run([str(x) for x in command], check=True, env=env, stdout=log, stderr=subprocess.STDOUT)
-    run([Path(env['JAVA_HOME']) / 'bin/javac', '-cp', os.pathsep.join(str(a.core / name) for name in ('lwjgl.jar', 'lwjgl-glfw.jar', 'lwjgl-vulkan.jar')),
-         '-d', out / 'classes', HERE / 'GraphicsSmoke.java'], 'javac.log')
+    run([Path(env['JAVA_HOME']) / 'bin/javac', '-cp', os.pathsep.join(str(a.core / name) for name in modules),
+         '-d', out / 'classes', HERE / (smoke + '.java')], 'javac.log')
     run([env['SCARLET_RUSTC'], '--edition=2024', '--target=aarch64-unknown-scarlet', '-C', 'panic=abort',
          '-C', 'target-feature=+crt-static', '-C', 'relocation-model=static', '-C', 'link-arg=--no-dynamic-linker',
          '-O', HERE / 'graphics_supervisor.rs', '-o', out / 'supervisor'], 'rustc.log')
@@ -48,12 +53,13 @@ def main():
         entries[name] = (0o100755 if executable else 0o100644, path.read_bytes()); inputs[name] = sha(path)
     add(a.init, 'init', True); add(a.loader, 'bin/scarlet-ld', True); add(a.java, 'bin/java', True)
     add(out / 'supervisor', 'bin/graphics-test', True)
+    entries['app/graphics-binding'] = (0o100644, a.binding.encode())
     add(a.vulkan, 'lib/libvulkan.so.1', True); add(a.icd, 'lib/libvulkan_sgfx.so', True)
     add(a.scarlet_ui, 'lib/libscarlet_ui_window.so', True)
     add(a.sws_client, 'lib/libsws_client_c.so', True); add(a.driver, 'lib/sgfx/libsgfx_scarlet_virgl.so', True)
     for path in a.core.iterdir():
         if path.suffix == '.jar': add(path, 'app/' + path.name)
-        elif path.suffix == '.so': add(path, 'app/native/' + path.name, True)
+        elif '.so' in path.suffixes: add(path, 'app/native/' + path.name, True)
     for base, dest in [(a.java_home, 'usr/lib/jvm/' + a.java_home.name), (out / 'classes', 'app/classes')]:
         for path in sorted(base.rglob('*')):
             if path.is_file(): add(path, dest + '/' + path.relative_to(base).as_posix())
@@ -75,7 +81,7 @@ def main():
             start = time.monotonic()
             while process.poll() is None and time.monotonic()-start < a.timeout:
                 text = (out / 'qemu.log').read_text(errors='replace')
-                if 'GRAPHICS READY_INPUT' in text and not sent:
+                if marker + ' READY_INPUT' in text and not sent:
                     time.sleep(a.input_delay)
                     connection = socket.socket(socket.AF_UNIX); connection.settimeout(5); connection.connect(str(qmp))
                     stream = connection.makefile('rwb', buffering=0)
@@ -99,10 +105,11 @@ def main():
             if connection: connection.close()
             qmp.unlink(missing_ok=True)
     text = (out / 'qemu.log').read_text(errors='replace')
-    compiled = all(re.search(r'\d+\s+\d+\s+[! ]*b\s+4\s+' + re.escape(name), text) for name in ('GraphicsSmoke::render', 'GraphicsSmoke::swapchain'))
-    passed = compiled and not timed_out and process.returncode == 0 and sent and 'GRAPHICS PASS' in text and 'GRAPHICS_GUEST PASS' in text
+    compiled = all(re.search(r'\d+\s+\d+\s+[! ]*b\s+4\s+' + re.escape(smoke + '::' + method), text) for method in ('render', 'swapchain'))
+    passed = compiled and not timed_out and process.returncode == 0 and sent and marker + ' PASS' in text and 'GRAPHICS_GUEST PASS' in text
+    if a.binding == 'sdl': passed = passed and 'VMA_NATIVE PASS' in text
     result = {'result':'PASS' if passed else 'FAIL', 'inputs':inputs, 'command':command, 'qemu_exit':process.returncode,
-              'timed_out':timed_out, 'input_sent':sent, 'c2_render_and_swapchain':compiled, 'log_sha256':sha(out / 'qemu.log')}
+              'binding':a.binding, 'timed_out':timed_out, 'input_sent':sent, 'c2_render_and_swapchain':compiled, 'log_sha256':sha(out / 'qemu.log')}
     (out / 'validation.json').write_text(json.dumps(result,indent=2)+'\n'); print(result['result'], out)
     if not passed: raise SystemExit(1)
 
